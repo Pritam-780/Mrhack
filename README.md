@@ -40,7 +40,7 @@ Mrhack is a Node.js-based information collection tool. It uses Express and EJS t
 ## How To Run (on Termux or Linux)
 
 ### 1. Install Node.js & Git
-
+#### 2.  Clone the Repository
 ```bash
 pkg update && pkg upgrade
 pkg install nodejs git
